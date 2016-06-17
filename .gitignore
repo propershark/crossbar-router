@@ -1,2 +1,5 @@
 # Ignore keys. They are private(-ish)
 key.*
+# Ignore pid files
+*.pid
+.crossbar/*.pid
