@@ -3,3 +3,6 @@ key.*
 # Ignore pid files
 *.pid
 .crossbar/*.pid
+
+# Ignore compiled Python files
+*.pyc
