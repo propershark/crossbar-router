@@ -6,3 +6,10 @@ key.*
 
 # Ignore compiled Python files
 *.pyc
+
+# Ignore the testing "web" directory
+web/*
+
+# Ignore log files
+**/*.log
+*.log
