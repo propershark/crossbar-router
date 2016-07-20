@@ -13,7 +13,7 @@ from autobahn.wamp.types import SubscribeOptions, PublishOptions
 #
 # The result is a list for each object type that represents the currently-
 # active set of objects for that type.
-ACTIVE_OBJECTS = defaultdict(list)
+ACTIVE_OBJECTS = defaultdict(dict)
 
 
 # A Crossbar component for storing lists of active objects for an agency (realm).
@@ -27,20 +27,20 @@ class AgencyRPCSession(ApplicationSession):
   def onJoin(self, details):
     print("Agency RPC Session joined: {}".format(details))
 
-
-
-    ACTIONS = defaultdict(lambda: lambda _, __: "nothing")
+    ACTIONS = defaultdict(lambda: lambda _, __, ___: "nothing")
     # Append the given object to the list of ACTIVE_OBJECTS under the given type.
-    ACTIONS['activate']   = lambda typ, obj: ACTIVE_OBJECTS[typ].append(obj)
+    ACTIONS['activate']   = lambda typ, topic, obj: ACTIVE_OBJECTS[typ].update({ topic: obj })
+    # Update the given object in the list of ACTIVE_OBJECTS under the given type.
+    ACTIONS['update']     = lambda typ, topic, obj: ACTIVE_OBJECTS[typ].update({ topic: obj })
     # Remove the given object from the list of ACTIVE_OBJECTS under the given type.
-    ACTIONS['deactivate'] = lambda typ, obj: ACTIVE_OBJECTS[typ].remove(obj)
+    ACTIONS['deactivate'] = lambda typ, topic, obj: ACTIVE_OBJECTS[typ].pop(topic, None)
 
     # Subscribe to all vehicle topics and store their activations/deactivations.
-    def vehicle_event(*args, **kwargs): ACTIONS[kwargs['event']]('vehicle', args[0])
+    def vehicle_event(*args, **kwargs): ACTIONS[kwargs['event']]('vehicle', kwargs['details'].topic, args[0])
     # Subscribe to all station topics and store their activations/deactivations.
-    def station_event(*args, **kwargs): ACTIONS[kwargs['event']]('station', args[0])
+    def station_event(*args, **kwargs): ACTIONS[kwargs['event']]('station', kwargs['details'].topic, args[0])
     # Subscribe to all route topics and store their activations/deactivations.
-    def route_event(*args, **kwargs):   ACTIONS[kwargs['event']]('route',   args[0])
+    def route_event(*args, **kwargs):   ACTIONS[kwargs['event']]('route',   kwargs['details'].topic, args[0])
 
 
     # Subscribe to the appropriate channels based on type
