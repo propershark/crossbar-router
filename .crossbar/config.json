@@ -43,7 +43,11 @@
               "directory": "../web"
             },
             "ws": {
-              "type": "websocket"
+              "type": "websocket",
+              "options": {
+                "auto_ping_interval": 10000,
+                "auto_ping_timeout": 20000
+              }
             }
           }
         }
