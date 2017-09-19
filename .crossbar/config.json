@@ -46,7 +46,8 @@
               "type": "websocket",
               "options": {
                 "auto_ping_interval": 10000,
-                "auto_ping_timeout": 20000
+                "auto_ping_timeout": 20000,
+                "auto_fragment_size": 65536
               }
             },
             "ws-client": {
