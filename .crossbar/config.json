@@ -8,7 +8,7 @@
           "name": "realm1",
           "roles": [
             {
-              "name": "anonymous",
+              "name": "server",
               "permissions": [
                 {
                   "uri": "",
@@ -26,33 +26,68 @@
                   "cache": true
                 }
               ]
+            },
+            {
+              "name": "client",
+              "permissions": [
+                {
+                  "uri": "",
+                  "match": "prefix",
+                  "allow": {
+                    "call": true,
+                    "register": false,
+                    "publish": false,
+                    "subscribe": true
+                  },
+                  "disclose": {
+                    "caller": false,
+                    "publisher": false
+                  },
+                  "cache": false
+                }
+              ]
             }
           ]
         }
       ],
       "transports": [
         {
-          "type": "web",
+          "type": "websocket",
+          "id": "ws_server",
           "endpoint": {
             "type": "tcp",
             "port": 8080
           },
-          "paths": {
-            "/": {
+          "auth": {
+            "anonymous": {
               "type": "static",
-              "directory": "../web"
-            },
-            "ws": {
-              "type": "websocket",
-              "options": {
-                "auto_ping_interval": 10000,
-                "auto_ping_timeout": 20000,
-                "auto_fragment_size": 65536
-              }
-            },
-            "ws-client": {
-              "type": "websocket"
+              "role": "server"
             }
+          },
+          "options": {
+            "auto_ping_interval": 10000,
+            "auto_ping_timeout": 20000,
+            "max_frame_size": 65536,
+            "auto_fragment_size": 65536
+          }
+        },
+        {
+          "type": "websocket",
+          "id": "ws_client",
+          "endpoint": {
+            "type": "tcp",
+            "port": 9000
+          },
+          "auth": {
+            "anonymous": {
+              "type": "static",
+              "role": "client"
+            }
+          },
+          "options": {
+            "auto_ping_interval": 30000,
+            "max_frame_size": 65536,
+            "auto_fragment_size": 65536
           }
         }
       ],
@@ -63,11 +98,13 @@
         {
           "type": "class",
           "classname": "history.HistorySession",
+          "role": "server",
           "realm": "realm1"
         },
         {
           "type": "class",
           "classname": "agency_rpcs.AgencyRPCSession",
+          "role": "server",
           "realm": "realm1"
         }
       ]
